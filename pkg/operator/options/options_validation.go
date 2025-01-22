@@ -19,6 +19,7 @@ package options
 import (
 	"fmt"
 	"net/url"
+	"strings"
 
 	"github.com/Azure/karpenter-provider-azure/pkg/consts"
 	"github.com/Azure/karpenter-provider-azure/pkg/utils"
@@ -36,6 +37,7 @@ func (o Options) Validate() error {
 		o.validateNetworkingOptions(),
 		o.validateVMMemoryOverheadPercent(),
 		o.validateVnetSubnetID(),
+		o.validateDiskEncryptionSetID(),
 		o.validateProvisionMode(),
 		validate.Struct(o),
 	)
@@ -77,6 +79,20 @@ func (o Options) validateVnetSubnetID() error {
 	if err != nil {
 		return fmt.Errorf("vnet-subnet-id is invalid: %w", err)
 	}
+	return nil
+}
+
+func (o Options) validateDiskEncryptionSetID() error {
+	if o.DiskEncryptionSetID == "" {
+		return nil
+	}
+
+	parts := strings.Split(o.DiskEncryptionSetID, "/")
+
+	if len(parts) != 9 {
+		return fmt.Errorf("invalid disk-encryption-set-id: %s", o.DiskEncryptionSetID)
+	}
+
 	return nil
 }
 
