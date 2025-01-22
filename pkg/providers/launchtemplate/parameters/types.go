@@ -42,6 +42,7 @@ type StaticParameters struct {
 	NetworkPlugin                  string
 	NetworkPolicy                  string
 	KubernetesVersion              string
+	DiskEncryptionSetID            string
 	SubnetID                       string
 	ClusterResourceGroup           string
 

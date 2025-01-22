@@ -405,6 +405,7 @@ func newVMObject(
 		Tags:  launchTemplate.Tags,
 	}
 	setVMPropertiesOSDiskType(vm.Properties, launchTemplate.StorageProfile)
+	setVMPropertiesDiskEncryptionSet(vm.Properties, launchTemplate.DiskEncryptionSetID)
 	setImageReference(vm.Properties, launchTemplate.ImageID, useSIG)
 	setVMPropertiesBillingProfile(vm.Properties, capacityType)
 
@@ -415,6 +416,14 @@ func newVMObject(
 	}
 
 	return vm
+}
+
+func setVMPropertiesDiskEncryptionSet(vmProperties *armcompute.VirtualMachineProperties, diskEncryptionSetID string) {
+	if diskEncryptionSetID != "" {
+		vmProperties.StorageProfile.OSDisk.ManagedDisk.DiskEncryptionSet = &armcompute.DiskEncryptionSetParameters{
+			ID: lo.ToPtr(diskEncryptionSetID),
+		}
+	}
 }
 
 // setVMPropertiesOSDiskType enables ephemeral os disk for instance types that support it
