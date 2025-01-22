@@ -53,6 +53,7 @@ type Template struct {
 	CustomScriptsCSE        string
 	IsWindows               bool
 	StorageProfile          string
+	DiskEncryptionSetID     string
 }
 
 type Provider struct {
@@ -164,6 +165,7 @@ func (p *Provider) getStaticParameters(ctx context.Context, instanceType *cloudp
 		KubeletClientTLSBootstrapToken: options.FromContext(ctx).KubeletClientTLSBootstrapToken,
 		NetworkPlugin:                  options.FromContext(ctx).NetworkPlugin,
 		NetworkPolicy:                  options.FromContext(ctx).NetworkPolicy,
+		DiskEncryptionSetID:            options.FromContext(ctx).DiskEncryptionSetID,
 		SubnetID:                       subnetID,
 		ClusterResourceGroup:           p.clusterResourceGroup,
 	}, nil
@@ -173,11 +175,12 @@ func (p *Provider) createLaunchTemplate(ctx context.Context, params *parameters.
 	// merge and convert to ARM tags
 	azureTags := mergeTags(params.Tags, map[string]string{karpenterManagedTagKey: params.ClusterName})
 	template := &Template{
-		ImageID:        params.ImageID,
-		Tags:           azureTags,
-		SubnetID:       params.SubnetID,
-		IsWindows:      params.IsWindows,
-		StorageProfile: params.StorageProfile,
+		ImageID:             params.ImageID,
+		Tags:                azureTags,
+		SubnetID:            params.SubnetID,
+		IsWindows:           params.IsWindows,
+		StorageProfile:      params.StorageProfile,
+		DiskEncryptionSetID: params.StaticParameters.DiskEncryptionSetID,
 	}
 
 	if p.provisionMode == consts.ProvisionModeBootstrappingClient {
