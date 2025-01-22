@@ -50,6 +50,7 @@ var _ = Describe("Options", func() {
 		"CLUSTER_ID",
 		"KUBELET_BOOTSTRAP_TOKEN",
 		"SSH_PUBLIC_KEY",
+		"CLUSTER_DISK_ENCRYPTION_SET_ID",
 		"NETWORK_PLUGIN",
 		"NETWORK_POLICY",
 		"NODE_IDENTITIES",
@@ -92,6 +93,7 @@ var _ = Describe("Options", func() {
 			os.Setenv("VM_MEMORY_OVERHEAD_PERCENT", "0.3")
 			os.Setenv("KUBELET_BOOTSTRAP_TOKEN", "env-bootstrap-token")
 			os.Setenv("SSH_PUBLIC_KEY", "env-ssh-public-key")
+			os.Setenv("CLUSTER_DISK_ENCRYPTION_SET_ID", "/subscriptions/12345678-1234-1234-1234-123456789012/resourceGroups/sillygeese/providers/Microsoft.Compute/diskEncryptionSets/karpenterdes")
 			os.Setenv("NETWORK_PLUGIN", "none") // Testing with none to make sure the default isn't overriding or something like that with "azure"
 			os.Setenv("NETWORK_PLUGIN_MODE", "")
 			os.Setenv("NETWORK_POLICY", "env-network-policy")
@@ -112,6 +114,7 @@ var _ = Describe("Options", func() {
 				ClusterID:                      lo.ToPtr("46593302"),
 				KubeletClientTLSBootstrapToken: lo.ToPtr("env-bootstrap-token"),
 				SSHPublicKey:                   lo.ToPtr("env-ssh-public-key"),
+				DiskEncryptionSetID:            lo.ToPtr("/subscriptions/12345678-1234-1234-1234-123456789012/resourceGroups/sillygeese/providers/Microsoft.Compute/diskEncryptionSets/karpenterdes"),
 				NetworkPlugin:                  lo.ToPtr("none"),
 				NetworkPolicy:                  lo.ToPtr("env-network-policy"),
 				SubnetID:                       lo.ToPtr("/subscriptions/12345678-1234-1234-1234-123456789012/resourceGroups/sillygeese/providers/Microsoft.Network/virtualNetworks/karpentervnet/subnets/karpentersub"),
@@ -312,6 +315,7 @@ func expectOptionsEqual(optsA *options.Options, optsB *options.Options) {
 	Expect(optsA.ClusterID).To(Equal(optsB.ClusterID))
 	Expect(optsA.KubeletClientTLSBootstrapToken).To(Equal(optsB.KubeletClientTLSBootstrapToken))
 	Expect(optsA.SSHPublicKey).To(Equal(optsB.SSHPublicKey))
+	Expect(optsA.DiskEncryptionSetID).To(Equal(optsB.DiskEncryptionSetID))
 	Expect(optsA.NetworkPlugin).To(Equal(optsB.NetworkPlugin))
 	Expect(optsA.NetworkPolicy).To(Equal(optsB.NetworkPolicy))
 	Expect(optsA.NodeIdentities).To(Equal(optsB.NodeIdentities))
