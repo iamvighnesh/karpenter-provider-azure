@@ -66,16 +66,18 @@ type Options struct {
 	ClusterID                      string
 	KubeletClientTLSBootstrapToken string // => TLSBootstrapToken in bootstrap (may need to be per node/nodepool)
 	SSHPublicKey                   string // ssh.publicKeys.keyData => VM SSH public key // TODO: move to v1alpha2.AKSNodeClass?
-	NetworkPlugin                  string // => NetworkPlugin in bootstrap
-	NetworkPolicy                  string // => NetworkPolicy in bootstrap
-	NetworkPluginMode              string // => Network Plugin Mode is used to control the mode the network plugin should operate in. For example, "overlay" used with --network-plugin=azure will use an overlay network (non-VNET IPs) for pods in the cluster. Learn more about overlay networking here: https://learn.microsoft.com/en-us/azure/aks/azure-cni-overlay?tabs=kubectl#overview-of-overlay-networking
-	NetworkDataplane               string
-	NodeIdentities                 []string // => Applied onto each VM
+
+	NetworkPlugin     string // => NetworkPlugin in bootstrap
+	NetworkPolicy     string // => NetworkPolicy in bootstrap
+	NetworkPluginMode string // => Network Plugin Mode is used to control the mode the network plugin should operate in. For example, "overlay" used with --network-plugin=azure will use an overlay network (non-VNET IPs) for pods in the cluster. Learn more about overlay networking here: https://learn.microsoft.com/en-us/azure/aks/azure-cni-overlay?tabs=kubectl#overview-of-overlay-networking
+	NetworkDataplane  string
+
+	NodeIdentities []string // => Applied onto each VM
 
 	DiskEncryptionSetID string // => DiskEncryptionSetID is used for encrypting OS and data disks for VMs in the node pool
-
-	SubnetID string // => VnetSubnetID to use (for nodes in Azure CNI Overlay and Azure CNI + pod subnet; for for nodes and pods in Azure CNI), unless overridden via AKSNodeClass
-	setFlags map[string]bool
+	VnetGUID       string   // resource guid used by azure cni for identifying the right vnet
+	SubnetID       string   // => VnetSubnetID to use (for nodes in Azure CNI Overlay and Azure CNI + pod subnet; for for nodes and pods in Azure CNI), unless overridden via AKSNodeClass
+	setFlags       map[string]bool
 
 	ProvisionMode              string
 	NodeBootstrappingServerURL string
@@ -96,6 +98,7 @@ func (o *Options) AddFlags(fs *coreoptions.FlagSet) {
 	fs.StringVar(&o.NetworkPolicy, "network-policy", env.WithDefaultString("NETWORK_POLICY", ""), "The network policy used by the cluster.")
 	fs.StringVar(&o.NetworkDataplane, "network-dataplane", env.WithDefaultString("NETWORK_DATAPLANE", "cilium"), "The network dataplane used by the cluster.")
 	fs.StringVar(&o.DiskEncryptionSetID, "disk-encryption-set-id", env.WithDefaultString("CLUSTER_DISK_ENCRYPTION_SET_ID", ""), "Disk Encryption Set ID for encrypting OS and data disks.")
+	fs.StringVar(&o.VnetGUID, "vnet-guid", env.WithDefaultString("VNET_GUID", ""), "The vnet guid of the clusters vnet, only required by azure cni with overlay")
 	fs.StringVar(&o.SubnetID, "vnet-subnet-id", env.WithDefaultString("VNET_SUBNET_ID", ""), "The default subnet ID to use for new nodes. This must be a valid ARM resource ID for subnet that does not overlap with the service CIDR or the pod CIDR.")
 	fs.Var(newNodeIdentitiesValue(env.WithDefaultString("NODE_IDENTITIES", ""), &o.NodeIdentities), "node-identities", "User assigned identities for nodes.")
 	fs.StringVar(&o.ProvisionMode, "provision-mode", env.WithDefaultString("PROVISION_MODE", consts.ProvisionModeAKSScriptless), "[UNSUPPORTED] The provision mode for the cluster.")
